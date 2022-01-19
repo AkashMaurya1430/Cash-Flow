@@ -1,0 +1,211 @@
+body {
+  /* padding: 50px; */
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-color: #e6f1ff;
+}
+
+:root {
+  --green: #62a800;
+  --orange: #ff8c00;
+}
+a {
+  color: #00b7ff;
+}
+
+* {
+  margin: 0 !important;
+  padding: 0;
+}
+
+.navbar {
+  background-color: #fff !important;
+  box-shadow: 0 0 15px 0px grey;
+}
+.container-fluid {
+  padding: 0em 2em !important;
+}
+.transaction-stats-container {
+  background-color: #fff;
+  padding: 1em;
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 1.5em !important;
+  margin-top: 2em !important;
+  border-radius: 10px;
+}
+
+.first-col h5 {
+  font-weight: 550;
+}
+
+.first-col p {
+  font-size: 0.9em;
+  color: var(--green);
+  margin-top: 0.3em !important;
+}
+
+.cash-stats h4 {
+  display: flex;
+  align-items: flex-start;
+}
+.cash-stats h4 span {
+  font-size: 0.7em !important;
+  margin-right: 5px !important;
+}
+
+.cash-in-stats h4 {
+  color: var(--green);
+}
+
+.cash-out-stats h4 {
+  color: var(--orange);
+}
+.chart-stats {
+  margin: 1.5em 3em !important;
+}
+.transaction-table {
+  background-color: #fff;
+  margin: 1.5em !important;
+  border-radius: 10px;
+  margin-top: 3em !important;
+}
+
+.transaction-table-heading {
+  font-weight: 550;
+}
+
+.add-cash-button {
+  padding: 0.5em 1em;
+  font-size: 0.7em;
+  background-color: #fff;
+  border-radius: 20px;
+  margin: 0 0.5em !important;
+}
+
+.add-cash-button i {
+  margin-right: 0.5em !important;
+}
+
+.add-cash-in-button {
+  border: 2px solid var(--green);
+  color: var(--green);
+}
+
+.add-cash-out-button {
+  border: 2px solid var(--orange);
+  color: var(--orange);
+}
+
+.modal-dialog {
+  margin: auto !important;
+}
+
+form label {
+  margin-bottom: 0.5em !important;
+}
+
+form input {
+  font-size: 1.1em !important;
+}
+
+.form-cash-in-btn {
+  padding: 0.5em 1em;
+  border: 0;
+  border-radius: 20px !important;
+  background-color: var(--green) !important;
+  font-size: 1.1em;
+}
+
+.form-cancel-btn {
+  padding: 0.5em 1em;
+  margin-right: 1em !important;
+  border: 1px solid var(--green);
+  border-radius: 20px !important;
+  background-color: #fff;
+  color: var(--green) !important;
+  font-size: 1.1em;
+}
+
+.form-cancel-btn:hover {
+  background-color: #fff !important;
+  border: 1px solid var(--green);
+}
+
+.fa-arrow-up {
+  color: var(--green);
+  margin-left: 5px !important;
+}
+
+.fa-arrow-down {
+  margin-left: 5px !important;
+  color: var(--orange);
+}
+.amount-data {
+  width: 50px;
+  display: inline-block;
+}
+
+.date-date {
+  /* opacity: 0; */
+}
+#addCashOutModal .form-cancel-btn {
+  border: 1px solid var(--orange) !important;
+  color: var(--orange) !important;
+}
+
+#addCashOutModal .form-cancel-btn:hover {
+  background-color: #fff !important;
+  border: 1px solid var(--orange);
+}
+
+#addCashOutModal .form-cash-in-btn {
+  background-color: var(--orange) !important;
+}
+
+.addAlertAmount {
+  background-color: #fff;
+  border-radius: 10px;
+  margin: 1.5em !important;
+  margin-top: 4em !important;
+  padding: 1em;
+}
+
+.alertAmountSubmitBtn {
+  padding: 0.5em 2em;
+  border: 0;
+  border-radius: 20px;
+  font-weight: 550;
+  color: #00b7ff;
+  border: 2px solid #00b7ff;
+  /* background-color: #62a800; */
+}
+
+.addAlertAmount label {
+  font-size: 1.1em;
+  font-weight: 550;
+}
+
+.fa-trash {
+  color: red;
+  cursor: pointer;
+}
+
+.filterTransactions {
+  font-size: 0.8em;
+  font-weight: 500;
+}
+
+.filterTransactions label {
+  margin-right: 5px !important;
+  margin-bottom: 0 !important;
+}
+
+.filterTransactions input {
+  font-size: 0.9em !important;
+
+}
+
+.filterTransactions div {
+  margin: 0 1em !important;
+}

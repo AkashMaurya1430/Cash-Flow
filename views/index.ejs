@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <%- include('imports') -%>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="stylesheets/style.css" />
+  </head>
+  <body>
+    <!-- ----------- Nav Bar ---------------------- -->
+    <nav class="navbar navbar-light">
+      <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">Cash Flow</span>
+      </div>
+    </nav>
+
+    <div class="mt-5 p-4 transaction-stats-container">
+      <div class="first-col">
+        <h5>Cash Metrics</h5>
+        <p>Last Updated on <%=userData.transactions[0] && userData.transactions[userData.transactions.length - 1].createdAt.toDateString() %></p>
+      </div>
+      <div class="cash-stats cash-total-stats">
+        <h6 class="text-muted">Total Balance</h6>
+        <h4><span>₹</span> <%= balance %></h4>
+      </div>
+      <div class="cash-stats cash-in-stats">
+        <h6 class="text-muted">Total cash in</h6>
+        <h4><span>₹</span> <%= totalCashIn %></h4>
+      </div>
+      <div class="cash-stats cash-out-stats">
+        <h6 class="text-muted">Total cash out</h6>
+        <h4><span>₹</span> <%= totalCashOut %></h4>
+      </div>
+    </div>
+
+    <div class="chart-stats">
+      <canvas id="myChart"></canvas>
+    </div>
+
+    <div class="addAlertAmount">
+      <form method="POST" action="/set-alert-value" class="row w-100 justify-content-between align-items-center">
+        <div class="col-5">
+          <% if(balanceWarningObj.status == 2){ %>
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <%=balanceWarningObj.message%> !
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <%} else if(balanceWarningObj.status == 1) {%>
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%=balanceWarningObj.message%> !
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <%}%>
+        </div>
+
+        <div class="col-5 d-flex">
+          <label for="alertAmount" class="col-auto col-form-label m-0">Set Min Balance</label>
+          <div class="col-5 ms-5 me-3">
+            <input
+              type="number"
+              name="alertAmount"
+              value="<%= userData.alertAmount %>"
+              class="form-control"
+              id="alertAmount"
+              placeholder="Enter an alert amount"
+            />
+          </div>
+          <button type="submit" class="alertAmountSubmitBtn">Save</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="p-4 transaction-table">
+      <h5 class="mb-3 d-flex justify-content-between align-items-center">
+        <span class="transaction-table-heading"> Transactions </span>
+
+        <form id="filter" method="GET" action="/"  class="filterTransactions d-flex">
+          <div class="d-flex flex-col align-items-center">
+            <label for="startDate">Start Date</label>
+            <input type="date" name="startDate" id="startDate" onchange="handleDateChange()" value="<%=startDate%>"/>
+          </div>
+          <div class="d-flex flex-col align-items-center">
+            <label for="endDate">End Date</label>
+            <input type="date" name="endDate" id="endDate" 
+            onchange="handleDateChange()" value="<%=endDate%>"
+            />
+          </div>
+        </form>
+
+        <div>
+          <button class="add-cash-button add-cash-in-button" data-bs-toggle="modal" data-bs-target="#addCashInModal">
+            <i class="faa fa-plus"></i>
+            Add Cash in
+          </button>
+
+          <button class="add-cash-button add-cash-out-button" data-bs-toggle="modal" data-bs-target="#addCashOutModal">
+            <i class="faa fa-plus"></i>
+            Add Cash out
+          </button>
+        </div>
+      </h5>
+
+      <table id="table_id" class="display">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Transaction ID</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% userData.transactions.forEach((transaction)=>{%>
+          <tr>
+            <td><%= transaction.vendorName %></td>
+            <td><%= transaction.type %></td>
+            <td>
+              <!-- <span class="date-date">
+                <%= new Date(transaction.date).getFullYear() +"/"+ new Date(transaction.date).getMonth() + "/" + new Date(transaction.date).getDate() %>
+              </span> -->
+              <%= transaction.date.toDateString() %>
+            </td>
+            <td>
+              <span class="amount-data"> <%= transaction.amount %> </span>
+              <% if(transaction.flow == 'in'){ %>
+              <i class="fas fa-arrow-up"></i>
+              <% } else{%>
+              <i class="fas fa-arrow-down"></i>
+
+              <% }%>
+            </td>
+            <td><%= transaction.UPITransactionID %></td>
+            <td class="text-center">
+              <i class="fas fa-trash" onclick="deleteTransaction(`<%= transaction._id %>`)" title="Delete Transaction"></i>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ------------ ADD Cash In Modal -----------------  -->
+    <div class="modal fade" id="addCashInModal" tabindex="-1" aria-labelledby="addCashInModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addCashInModalLabel">Add Cash In</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form autocomplete="off" class="row g-3 needs-validation" method="POST" action="/cash-in" novalidate>
+              <div class="col-md-12">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="provide vendor name" required />
+                <div class="invalid-feedback">Please provide vendor name.</div>
+              </div>
+
+              <div class="col-md-6 mt-3">
+                <label for="type" class="form-label">Category</label>
+                <input
+                  type="text"
+                  placeholder="Food, Clothing, Fuel.... "
+                  class="form-control"
+                  list="categories_List"
+                  name="type"
+                  id="type"
+                  required
+                />
+                <datalist id="categories_List">
+                  <%categories.forEach((category)=>{%>
+
+                  <option value="<%= category %>"></option>
+                  <%}) %>
+                </datalist>
+                <div class="invalid-feedback">Please provide a type.</div>
+              </div>
+
+              <div class="col-md-6 mt-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" class="form-control" name="date" id="date" required />
+                <div class="invalid-feedback">Please provide a date.</div>
+              </div>
+
+              <div class="col-md-12 mt-3 input-group">
+                <span class="input-group-text">₹</span>
+                <input type="number" name="amount" class="form-control" placeholder="Amount" required />
+                <div class="invalid-feedback">Please provide an amount.</div>
+              </div>
+
+              <div class="col-md-12 mt-3">
+                <label for="upiId" class="form-label">UPI Transaction ID</label>
+                <input type="number" name="UPIID" class="form-control" placeholder="upi transaction id" required />
+                <div class="invalid-feedback">Please provide an upi transaction id.</div>
+              </div>
+
+              <div class="col-12 mt-4 text-end">
+                <button class="btn btn-primary form-cancel-btn" type="button" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary form-cash-in-btn" type="submit">Add cash in</button>
+              </div>
+            </form>
+          </div>
+          <!-- <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------ ADD Cash Out Modal -----------------  -->
+    <div class="modal fade" id="addCashOutModal" tabindex="-1" aria-labelledby="addCashOutModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addCashOutModalLabel">Add Cash Out</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form autocomplete="off" class="row g-3 needs-validation" method="POST" action="/cash-out" novalidate>
+              <div class="col-md-12">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="provide vendor name" required />
+                <div class="invalid-feedback">Please provide vendor name.</div>
+              </div>
+
+              <div class="col-md-6 mt-3">
+                <label for="type" class="form-label">Category</label>
+                <input
+                  list="categories_List"
+                  type="text"
+                  placeholder="Food, Clothing, Fuel.... "
+                  class="form-control"
+                  name="type"
+                  id="type"
+                  required
+                />
+                <div class="invalid-feedback">Please provide a type.</div>
+              </div>
+
+              <div class="col-md-6 mt-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" class="form-control" name="date" id="date" required />
+                <div class="invalid-feedback">Please provide a date.</div>
+              </div>
+
+              <div class="col-md-12 mt-3 input-group">
+                <span class="input-group-text">₹</span>
+                <input type="number" name="amount" class="form-control" placeholder="Amount" required />
+                <div class="invalid-feedback">Please provide an amout.</div>
+              </div>
+
+              <div class="col-md-12 mt-3">
+                <label for="upiId" class="form-label">UPI Transaction ID</label>
+                <input type="number" name="UPIID" class="form-control" placeholder="upi transaction id" required />
+                <div class="invalid-feedback">Please provide an upi transaction id.</div>
+              </div>
+              <div class="col-12 mt-4 text-end">
+                <button class="btn btn-primary form-cancel-btn" type="button" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary form-cash-in-btn" type="submit">Add cash out</button>
+              </div>
+            </form>
+          </div>
+          <!-- <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Save changes</button>
+            </div> -->
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script src="javascripts/index.js"></script>
+</html>
